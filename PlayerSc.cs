@@ -1,3 +1,5 @@
+using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerSc : MonoBehaviour
@@ -8,13 +10,15 @@ public class PlayerSc : MonoBehaviour
     private float _canFire = -1f;
     [SerializeField] private int _lives = 3;
     [SerializeField] private SpawnManager _spawnManager;
+    [SerializeField] bool isTripleShotActive = false;    //
+    [SerializeField] GameObject tripleLaserPrefab;
 
     private const float Y_MIN = -3.8f, Y_MAX = 0f, X_MIN = -11.3f, X_MAX = 11.3f;
 
     void Awake()
     {
         if (_spawnManager == null)
-            _spawnManager = FindObjectOfType<SpawnManager>();
+            _spawnManager = FindFirstObjectByType<SpawnManager>();
     }
 
     void Start()
@@ -44,12 +48,19 @@ public class PlayerSc : MonoBehaviour
         transform.position = new Vector3(x, y, 0);
     }
 
-    void FireLaser()
-    {
-        _canFire = Time.time + _fireRate;
-        Instantiate(_laserPrefab, transform.position + Vector3.up * 0.8f, Quaternion.identity);
-    }
+   void FireLaser()
+{
+    _canFire = Time.time + _fireRate;  
 
+    if (isTripleShotActive)
+    {
+        Instantiate(tripleLaserPrefab, transform.position + Vector3.up * 0.8f, Quaternion.identity);  // Üçlü atış
+    }
+    else
+    {
+        Instantiate(_laserPrefab, transform.position + Vector3.up * 0.8f, Quaternion.identity);  // Tek atış
+    }
+}
     public void Damage()
     {
         _lives--;
@@ -59,4 +70,15 @@ public class PlayerSc : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    public void TripleShootActive() //
+    {
+        isTripleShotActive = true;
+        StartCoroutine(TripleShotCancelRoutuine());
+    }
+    IEnumerator TripleShotCancelRoutuine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        isTripleShotActive = false;
+    }
+   
 }

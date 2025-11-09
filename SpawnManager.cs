@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -7,9 +8,12 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private float _spawnRate = 3f;
     private bool _stopSpawning = false;
 
+    public GameObject TripleShootBonusPrefab;
+
     void Start()
     {
         InvokeRepeating(nameof(SpawnEnemy), 1f, _spawnRate);
+        StartCoroutine(SpawnBonusRoutine());
     }
 
     void SpawnEnemy()
@@ -24,5 +28,16 @@ public class SpawnManager : MonoBehaviour
     {
         _stopSpawning = true;
         CancelInvoke(nameof(SpawnEnemy));
+    }
+     IEnumerator SpawnBonusRoutine()
+    {
+        while (_stopSpawning == false)
+        {
+            Vector3 position = new Vector3(Random.Range(-9.5f, 9.5f), 7.4f, 0);
+            GameObject TripleShootBonus = Instantiate(TripleShootBonusPrefab, position, Quaternion.identity);
+            yield return new WaitForSeconds(5f);
+
+
+        }
     }
 }
